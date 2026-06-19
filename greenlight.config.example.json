@@ -1,0 +1,16 @@
+{
+  "mode": "auto",
+  "allow": ["*"],
+  "deny": [
+    "rm -rf",
+    "DROP TABLE",
+    "DROP DATABASE",
+    "format c:",
+    "mkfs",
+    ":(){:|:&};:"
+  ],
+  "logFile": "./greenlight.log",
+  "dryRun": false,
+  "responseDelayMs": 120,
+  "verbose": false
+}
