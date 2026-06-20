@@ -1,0 +1,50 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (Node ${{ matrix.node-version }} / ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: ['18.x', '20.x']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # No package-lock.json is committed yet, so `npm ci` isn't usable.
+      - name: Install dependencies
+        run: npm install
+
+      - name: Type-check & compile (tsc)
+        run: npm run build
+
+      # No eslint config file exists yet (.eslintrc*/eslint.config.js).
+      # Kept non-blocking until one is added so CI doesn't fail on an
+      # unrelated missing-config error.
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true
+
+      # No jest config and no *.test.ts files exist yet. Kept
+      # non-blocking until real tests are added.
+      - name: Test
+        run: npm test
+        continue-on-error: true
+
+      - name: Verify CLI entrypoint
+        run: node dist/index.js --version
