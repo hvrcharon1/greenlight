@@ -1,5 +1,10 @@
 # 🟢 Greenlight
 
+[![Build](https://github.com/hvrcharon1/greenlight/actions/workflows/build.yml/badge.svg)](https://github.com/hvrcharon1/greenlight/actions/workflows/build.yml)
+[![Release](https://github.com/hvrcharon1/greenlight/actions/workflows/release.yml/badge.svg)](https://github.com/hvrcharon1/greenlight/actions/workflows/release.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#license)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](#install)
+
 > **Zero-friction auto-approval daemon for Claude Code permission prompts**
 
 Greenlight wraps any interactive AI coding agent (primarily **Claude Code**) inside a pseudo-terminal and silently approves the repetitive `[Y/n]`, arrow-key, and tick-based permission prompts — so your workflow never stalls waiting for a keypress.
@@ -49,7 +54,7 @@ npm install -g greenlight
 npx greenlight -- claude
 ```
 
-> **Requires Node.js ≥ 18** and the `node-pty` native addon (pre-built binaries are bundled for macOS, Linux, and Windows).
+> **Requires Node.js ≥ 18** and the `node-pty` native addon (built from source on install; a working C++ toolchain and Python are required on platforms without prebuilt binaries). Continuously tested on Node 18.x and 20.x across Linux, macOS, and Windows — see the Build badge above.
 
 ---
 
@@ -176,14 +181,16 @@ Run `greenlight --list-patterns` to see all patterns. Built-in patterns include:
 | Pattern name | Matches |
 |---|---|
 | `claude-code-tool-yn` | `Allow bash_20250124 to execute: … [Y/n]` |
-| `generic-yn` | Any `… [Y/n]` or `… [y/N]` |
-| `arrow-select-yes-focused` | `❯ Yes` (TUI menu, Yes already selected) |
-| `inquirer-arrow-keys` | `? <question> (Use arrow keys)` |
 | `write-file-yn` | `Write to <path>? [Y/n]` |
 | `read-file-yn` | `Read <path>? [Y/n]` |
+| `generic-yn` | Any `… [Y/n]` or `… [y/N]` (checked after the more specific patterns above) |
+| `arrow-select-yes-focused` | `❯ Yes` (TUI menu, Yes already selected) |
+| `inquirer-arrow-keys` | `? <question> (Use arrow keys)` |
 | `press-enter` | `Press <Enter> to continue/confirm` |
 | `do-you-want-to` | `Do you want to …? [Yes/No]` |
 | `approve-yn-paren` | `…? (y/n)` |
+
+> Pattern order matters: `detectPrompt` returns the **first** match, so the specific `write-file-yn` / `read-file-yn` / `claude-code-tool-yn` patterns are deliberately checked before the `generic-yn` catch-all.
 
 ---
 
@@ -191,16 +198,23 @@ Run `greenlight --list-patterns` to see all patterns. Built-in patterns include:
 
 ```
 greenlight
+├── .github/
+│   └── workflows/
+│       ├── build.yml      CI — install, build, lint, test on Node 18.x/20.x × Linux/macOS/Windows
+│       └── release.yml    Builds & publishes a GitHub Release on every vX.Y.Z tag push
 ├── src/
-│   ├── index.ts      CLI — Commander, banners, session summary
-│   ├── daemon.ts     PTY daemon — spawn, relay, orchestrate
-│   ├── detector.ts   ANSI-strip + pattern matching engine
-│   ├── approver.ts   Allow/deny/escalate decision + keystroke selection
-│   ├── logger.ts     Coloured stderr console + NDJSON file appender
-│   ├── config.ts     cosmiconfig loader + Zod schema
-│   └── types.ts      Shared TypeScript interfaces
+│   ├── index.ts       CLI — Commander, banners, session summary
+│   ├── daemon.ts      PTY daemon — spawn, relay, orchestrate
+│   ├── detector.ts    ANSI-strip + pattern matching engine
+│   ├── detector.test.ts  Jest suite covering every built-in pattern
+│   ├── approver.ts    Allow/deny/escalate decision + keystroke selection
+│   ├── logger.ts      Coloured stderr console + NDJSON file appender
+│   ├── config.ts      cosmiconfig loader + Zod schema
+│   └── types.ts       Shared TypeScript interfaces
 ├── assets/
 │   └── logo.svg
+├── .eslintrc.json     ESLint + @typescript-eslint config
+├── jest.config.js     ts-jest configuration
 └── greenlight.config.example.json
 ```
 
@@ -214,7 +228,19 @@ cd greenlight
 npm install
 npm run build      # compiles TypeScript → dist/
 npm run dev        # ts-node in watch mode
-npm test           # jest
+npm run lint        # eslint over src/**/*.ts
+npm test           # jest — see src/detector.test.ts
+```
+
+### CI/CD
+
+- **Build** (`.github/workflows/build.yml`) runs on every push/PR to `main` and can also be triggered manually. It installs dependencies, type-checks and compiles with `tsc`, runs ESLint, runs the Jest suite, and smoke-tests the compiled CLI — across a 3 OS × 2 Node-version matrix (18.x and 20.x on Ubuntu, macOS, and Windows).
+- **Release** (`.github/workflows/release.yml`) triggers when a tag matching `vX.Y.Z` is pushed. It builds the project, packs an npm tarball, and publishes a GitHub Release with auto-generated notes and the tarball attached.
+
+```bash
+# Cut a release
+git tag v0.1.0 -m "Greenlight v0.1.0"
+git push origin v0.1.0
 ```
 
 ---
