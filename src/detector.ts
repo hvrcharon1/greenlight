@@ -50,6 +50,28 @@ const PATTERNS: PatternDef[] = [
     extractTool: (m) => m[1].replace(/_\d+$/, ''), // strip timestamp suffix
   },
 
+  // ── Claude Code write-file confirmation ─────────────────────────────────
+  // "Write to <path>? [Y/n]"
+  // NOTE: must come before the generic [Y/n] catch-all below, otherwise
+  // that pattern matches first and this one never fires.
+  {
+    name: 'write-file-yn',
+    re: /Write\s+(?:to\s+)?(['"`]?)(.+?)\1\s*\?\s*\[Y\/n\]/i,
+    type: 'yn-inline',
+    extractAction: (m) => `Write to ${m[2]}`,
+    extractTool: () => 'Write',
+  },
+
+  // ── Claude Code read-file confirmation ──────────────────────────────────
+  // NOTE: must also come before the generic [Y/n] catch-all below.
+  {
+    name: 'read-file-yn',
+    re: /Read\s+(?:file\s+)?(['"`]?)(.+?)\1\s*\?\s*\[Y\/n\]/i,
+    type: 'yn-inline',
+    extractAction: (m) => `Read ${m[2]}`,
+    extractTool: () => 'Read',
+  },
+
   // ── Generic [Y/n] / [y/N] inline prompt ────────────────────────────────
   // Example: "Overwrite file? [y/N]"
   {
@@ -75,25 +97,6 @@ const PATTERNS: PatternDef[] = [
     re: /\?\s+(.{5,120})\s+\(Use arrow keys\)/i,
     type: 'arrow-select',
     extractAction: (m) => m[1].trim(),
-  },
-
-  // ── Claude Code write-file confirmation ─────────────────────────────────
-  // "Write to <path>? [Y/n]"
-  {
-    name: 'write-file-yn',
-    re: /Write\s+(?:to\s+)?(['"`]?)(.+?)\1\s*\?\s*\[Y\/n\]/i,
-    type: 'yn-inline',
-    extractAction: (m) => `Write to ${m[2]}`,
-    extractTool: () => 'Write',
-  },
-
-  // ── Claude Code read-file confirmation ──────────────────────────────────
-  {
-    name: 'read-file-yn',
-    re: /Read\s+(?:file\s+)?(['"`]?)(.+?)\1\s*\?\s*\[Y\/n\]/i,
-    type: 'yn-inline',
-    extractAction: (m) => `Read ${m[2]}`,
-    extractTool: () => 'Read',
   },
 
   // ── Press Enter to continue ──────────────────────────────────────────────

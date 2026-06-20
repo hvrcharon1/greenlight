@@ -33,18 +33,11 @@ jobs:
       - name: Type-check & compile (tsc)
         run: npm run build
 
-      # No eslint config file exists yet (.eslintrc*/eslint.config.js).
-      # Kept non-blocking until one is added so CI doesn't fail on an
-      # unrelated missing-config error.
       - name: Lint
         run: npm run lint
-        continue-on-error: true
 
-      # No jest config and no *.test.ts files exist yet. Kept
-      # non-blocking until real tests are added.
       - name: Test
         run: npm test
-        continue-on-error: true
 
       - name: Verify CLI entrypoint
         run: node dist/index.js --version

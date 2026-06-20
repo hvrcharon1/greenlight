@@ -28,11 +28,9 @@ const decisionIcon = {
 export class GreenlightLogger {
   private stream: WriteStream | null = null;
   private verbose: boolean;
-  private dryRun: boolean;
 
   constructor(config: GreenlightConfig) {
     this.verbose = config.verbose;
-    this.dryRun = config.dryRun;
 
     if (config.logFile) {
       this.stream = createWriteStream(config.logFile, { flags: 'a' });
