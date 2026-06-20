@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/hvrcharon1/greenlight/actions/workflows/build.yml/badge.svg)](https://github.com/hvrcharon1/greenlight/actions/workflows/build.yml)
 [![Release](https://github.com/hvrcharon1/greenlight/actions/workflows/release.yml/badge.svg)](https://github.com/hvrcharon1/greenlight/actions/workflows/release.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#license)
+[![License: Datacules LLC Open Source](https://img.shields.io/badge/License-Datacules%20LLC%20Open%20Source-blue.svg)](#license)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](#install)
 
 > **Zero-friction auto-approval daemon for Claude Code permission prompts**
@@ -256,4 +256,6 @@ git push origin v0.1.0
 
 ## License
 
-MIT © [hvrcharon1](https://github.com/hvrcharon1)
+[Datacules LLC Open Source License](./LICENSE) — a permissive, MIT-style license. Free to use, modify, and distribute.
+
+Copyright © 2026 [Datacules LLC](https://github.com/hvrcharon1)

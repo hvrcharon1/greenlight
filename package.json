@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Zero-friction auto-approval daemon for Claude Code permission prompts",
   "author": "hvrcharon1",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "bin": {
     "greenlight": "./dist/index.js"
   },
@@ -12,7 +12,8 @@
   "files": [
     "dist",
     "assets/logo.svg",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc --project tsconfig.json",
